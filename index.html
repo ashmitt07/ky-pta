@@ -5,32 +5,40 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <style>
-  body {
+  html, body {
     margin: 0;
-    background: #000000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    padding: 0;
+    background: #000;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
   }
   canvas {
-    background: url('https://i.ibb.co/V0sbKt5P/back.jpg') repeat-x;
-    border: 2px solid #000;
+    display: block;
     touch-action: none;
   }
 </style>
 </head>
 <body>
-<canvas id="gameCanvas" width="400" height="600"></canvas>
+<canvas id="gameCanvas"></canvas>
 <script>
 // Canvas setup
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// Fullscreen resize
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+window.addEventListener('orientationchange', resizeCanvas);
+resizeCanvas();
+
 // Bird properties
 const bird = {
   x: 60,
-  y: 300,
+  y: canvas.height / 2,
   width: 64,
   height: 54,
   gravity: 0.2,
@@ -52,8 +60,6 @@ bgImg.src = "https://i.ibb.co/V0sbKt5P/back.jpg";
 let bgX = 0;
 
 // Audio
-const soundWelcome = new Audio("https://www.myinstants.com/media/sounds/startup-sound.mp3");
-const soundStart = new Audio("https://www.myinstants.com/media/sounds/game-start.mp3");
 const soundBackground = new Audio("https://www.myinstants.com/media/sounds/my-movie-6_0RlWMvM.mp3");
 soundBackground.loop = true;
 
@@ -72,18 +78,9 @@ function stopAllSounds() {
   });
 }
 
-function playSoundSequentially(audio) {
-  return new Promise(resolve => {
-    audio.currentTime = 0;
-    audio.play();
-    audio.onended = resolve;
-  });
-}
-
 const pipeWidth = 60;
-const gap = 200;
+const gap = canvas.height * 0.35;
 
-// Pipe spawn timing
 let pipeSpawnTimer = 0;
 const pipeSpawnInterval = 90;
 
@@ -97,7 +94,7 @@ function createPipe() {
   });
 }
 
-async function handleInput() {
+function handleInput() {
   if (gameOver) {
     stopAllSounds();
     restartSound.currentTime = 0;
@@ -105,33 +102,28 @@ async function handleInput() {
     resetGame();
     soundBackground.play();
   } else {
-  if (!gameStarted) {
-  gameStarted = true;
-  soundBackground.currentTime = 0;
-  soundBackground.play();
-}
-bird.velocity = bird.lift;
-jumpSound.currentTime = 0;
-jumpSound.play();
-
+    if (!gameStarted) {
+      gameStarted = true;
+      soundBackground.currentTime = 0;
+      soundBackground.play();
+    }
+    bird.velocity = bird.lift;
+    jumpSound.currentTime = 0;
+    jumpSound.play();
   }
 }
 
-
-// Desktop space key
 document.addEventListener("keydown", function(e) {
   if (e.code === "Space") {
     handleInput();
   }
 });
 
-// Mobile touch
 canvas.addEventListener("touchstart", function(e) {
-  e.preventDefault(); // zoom disable
+  e.preventDefault();
   handleInput();
 }, { passive: false });
 
-// Reusable rects
 const birdRect = {x:0,y:0,width:0,height:0};
 const topRect = {x:0,y:0,width:pipeWidth,height:0};
 const bottomRect = {x:0,y:0,width:pipeWidth,height:0};
@@ -151,8 +143,9 @@ async function handleGameOverSounds() {
   if (handlingGameOver) return;
   handlingGameOver = true;
   stopAllSounds();
-  await playSoundSequentially(collisionSound);
-  await playSoundSequentially(gameOverSound);
+  collisionSound.play();
+  await new Promise(r => setTimeout(r, 500));
+  gameOverSound.play();
 }
 
 function getBirdAngle() {
@@ -236,10 +229,9 @@ function draw() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white";
     ctx.font = "36px Arial";
-    ctx.fillText("bss hogya 😂", 110, 250);
+    ctx.fillText("bss hogya 😂", canvas.width / 2 - 100, canvas.height / 2 - 20);
     ctx.font = "24px Arial";
-    ctx.fillText("aagar vapis khelna h to", 80, 300);
-    ctx.fillText("Tap ya Space dabake restart kr", 40, 350);
+    ctx.fillText("Tap ya Space dabake restart kr", canvas.width / 2 - 150, canvas.height / 2 + 20);
   }
 }
 
@@ -250,7 +242,7 @@ function loop() {
 }
 
 function resetGame() {
-  bird.y = 300;
+  bird.y = canvas.height / 2;
   bird.velocity = 0;
   pipes = [];
   score = 0;
