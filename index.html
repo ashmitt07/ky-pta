@@ -26,14 +26,13 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Fullscreen resize
 function resizeCanvas() {
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.height = document.documentElement.clientHeight;
 }
+resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('orientationchange', resizeCanvas);
-resizeCanvas();
 
 // Bird properties
 const bird = {
@@ -229,9 +228,9 @@ function draw() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white";
     ctx.font = "36px Arial";
-    ctx.fillText("bss hogya 😂", canvas.width / 2 - 100, canvas.height / 2 - 20);
+    ctx.fillText("bss hogya 😂", canvas.width/2 - 100, canvas.height/2 - 20);
     ctx.font = "24px Arial";
-    ctx.fillText("Tap ya Space dabake restart kr", canvas.width / 2 - 150, canvas.height / 2 + 20);
+    ctx.fillText("Tap ya Space dabake restart kr", canvas.width/2 - 150, canvas.height/2 + 20);
   }
 }
 
