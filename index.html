@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
   body {
     margin: 0;
@@ -123,9 +124,10 @@ document.addEventListener("keydown", function(e) {
 });
 
 // Mobile touch
-canvas.addEventListener("touchstart", function() {
+canvas.addEventListener("touchstart", function(e) {
+  e.preventDefault(); // zoom disable
   handleInput();
-});
+}, { passive: false });
 
 // Reusable rects
 const birdRect = {x:0,y:0,width:0,height:0};
